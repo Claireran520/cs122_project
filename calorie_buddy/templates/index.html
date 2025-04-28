@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calorie Meal Planner</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background-color: #f8f8f8; }
+        .combo { margin-bottom: 30px; background: white; padding: 15px; border-radius: 10px; }
+        h2 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Daily Calorie Meal Generator</h1>
+    <form method="post">
+        <label>Enter your daily calorie target:</label>
+        <input type="number" name="calorie_target" required>
+        <button type="submit">Generate Meals</button>
+    </form>
+
+    {% if calorie_target %}
+        <h2>Meal combinations for {{ calorie_target }} calories</h2>
+        {% for category, combo in meal_combinations.items() %}
+            <div class="combo">
+                <h3>{{ category }} (Total: {{ combo.total }} Cal)</h3>
+                <ul>
+                    {% for meal in combo.meals %}
+                        <li>{{ meal.Food }} - {{ meal.Calories }} Cal (<a href="{{ meal.URL }}">Source</a>)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
