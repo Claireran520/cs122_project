@@ -1,77 +1,43 @@
 from flask import Flask, render_template, request
-import pandas as pd
-import random
+from meal_generator import generate_meal_plans
+from data_processor import load_and_process_data
 
 app = Flask(__name__)
 
-# Load food data
-df = pd.read_csv("calories.csv")
-
-# Define the category mapping by subcategory
-CATEGORY_MAP = {
-    "Seafood Mix": [
-        "Shellfish", "Crustaceans", "Fish", "Seafood"
-    ],
-    "Non-Vegetarian": [
-        "Meat", "Poultry", "Sausages", "Bacon", "Beef", "Lamb"
-    ],
-    "Vegetarian": [
-        "Dairy", "Cheese", "Eggs", "Vegetarian Meals"
-    ],
-    "Vegan": [
-        "Fruits", "Vegetables", "Legumes", "Tofu", "Vegan Meals"
-    ]
-}
-
-# Classify each food item
-def classify_row(row):
-    for category, subs in CATEGORY_MAP.items():
-        if any(sub.lower() in row['Subcategory'].lower() for sub in subs):
-            return category
-    return None
-
-df["Category"] = df.apply(classify_row, axis=1)
-df = df[df["Category"].notnull()]
-
-# Generate one combo under calorie limit
-def generate_combo(category, target_calories):
-    category_df = df[df["Category"] == category]
-    subcategories = category_df["Subcategory"].unique()
-    random.shuffle(subcategories)
-    
-    selected = []
-    remaining_cal = target_calories
-
-    for sub in subcategories:
-        options = category_df[(category_df["Subcategory"] == sub) & (category_df["Calories"] <= remaining_cal)]
-        if not options.empty:
-            food = options.sample(1).iloc[0]
-            selected.append(food)
-            remaining_cal -= food["Calories"]
-        if len(selected) == 4:
-            break
-
-    total_cal = sum(item["Calories"] for item in selected)
-    return selected, total_cal
+# Load food data once at startup
+try:
+    food_data = load_and_process_data("calories.csv")
+except Exception as e:
+    food_data = None
+    print(f"Error loading data: {e}")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    meal_combinations = {}
-    calorie_target = None
+    meal_plans = None
+    target_calories = 2000
+    error = None
 
     if request.method == "POST":
         try:
-            calorie_target = int(request.form["calorie_target"])
-            for category in ["Vegetarian", "Non-Vegetarian", "Seafood Mix", "Vegan"]:
-                combo, total = generate_combo(category, calorie_target)
-                meal_combinations[category] = {
-                    "meals": combo,
-                    "total": total
-                }
-        except Exception as e:
-            print("Error:", e)
+            target_calories = int(request.form["calories"])
+            min_calories = int(target_calories * 0.9)
+            max_calories = int(target_calories * 1.1)
 
-    return render_template("index.html", meal_combinations=meal_combinations, calorie_target=calorie_target)
+            meal_plans = generate_meal_plans(
+                food_data,
+                target_calories=target_calories,
+                min_calories=min_calories,
+                max_calories=max_calories
+            )
+        except Exception as e:
+            error = str(e)
+
+    return render_template(
+        "index.html",
+        meal_plans=meal_plans,
+        target_calories=target_calories,
+        error=error
+    )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port = 5001)
