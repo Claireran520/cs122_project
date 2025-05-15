@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Calorie Buddy{% endblock %}
+
+{% block content %}
+<div class="row" style="display: flex; justify-content: center; margin-top: 50px;">
+    <div style="width: 100%; max-width: 500px;">
+        <div class="card">
+            <div class="card-header">
+                Create a New Account
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                <p style="margin: 0; text-align: center;">Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary-color); text-decoration: none;">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

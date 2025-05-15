@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Meal Planner - Calorie Buddy{% endblock %}
+
+{% block content %}
+<h1 class="page-header">Meal Planner</h1>
+
+<div class="card">
+    <div class="card-header">
+        Target Calorie Settings
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('meal_planner') }}">
+            <div class="form-group">
+                <label for="target_calories">Target Daily Calories</label>
+                <input type="number" class="form-control" id="target_calories" name="target_calories" min="100" max="5000" value="{{ target_calories }}" required>
+                <small style="color: #666;">Recommended daily caloric intake varies based on age, gender, and activity level.</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Meal Plans</button>
+        </form>
+    </div>
+</div>
+
+{% if meal_plans %}
+<h2 class="section-header">Generated Meal Plans</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+    {% if meal_plans.Vegetarian.foods %}
+    <div class="card meal-plan-card vegetarian">
+        <div class="card-header" style="background-color: #4CAF50;">
+            Vegetarian Plan
+        </div>
+        <div class="card-body">
+            <div class="calorie-display" style="background-color: rgba(76, 175, 80, 0.1); color: #4CAF50;">
+                <span style="font-weight: 600;">{{ meal_plans.Vegetarian.total_calories }}</span> calories
+            </div>
+            
+            <div>
+                {% for food in meal_plans.Vegetarian.foods %}
+                <div class="food-item">
+                    <span style="font-weight: 500; color: #4CAF50;">#{{ loop.index }}</span> {{ food.food }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <form method="POST" action="{{ url_for('save_meal_plan') }}" style="margin-top: 20px;">
+                <input type="hidden" name="diet_type" value="Vegetarian">
+                <input type="hidden" name="target_calories" value="{{ target_calories }}">
+                <input type="hidden" name="actual_calories" value="{{ meal_plans.Vegetarian.total_calories }}">
+                <input type="hidden" name="foods" value="{{ meal_plans.Vegetarian.foods|map(attribute='food')|list|tojson }}">
+                <button type="submit" class="btn btn-outline" style="border-color: #4CAF50; color: #4CAF50;">Save Plan</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if meal_plans['Non-Vegetarian'].foods %}
+    <div class="card meal-plan-card non-vegetarian">
+        <div class="card-header" style="background-color: #F44336;">
+            Non-Vegetarian Plan
+        </div>
+        <div class="card-body">
+            <div class="calorie-display" style="background-color: rgba(244, 67, 54, 0.1); color: #F44336;">
+                <span style="font-weight: 600;">{{ meal_plans['Non-Vegetarian'].total_calories }}</span> calories
+            </div>
+            
+            <div>
+                {% for food in meal_plans['Non-Vegetarian'].foods %}
+                <div class="food-item">
+                    <span style="font-weight: 500; color: #F44336;">#{{ loop.index }}</span> {{ food.food }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <form method="POST" action="{{ url_for('save_meal_plan') }}" style="margin-top: 20px;">
+                <input type="hidden" name="diet_type" value="Non-Vegetarian">
+                <input type="hidden" name="target_calories" value="{{ target_calories }}">
+                <input type="hidden" name="actual_calories" value="{{ meal_plans['Non-Vegetarian'].total_calories }}">
+                <input type="hidden" name="foods" value="{{ meal_plans['Non-Vegetarian'].foods|map(attribute='food')|list|tojson }}">
+                <button type="submit" class="btn btn-outline" style="border-color: #F44336; color: #F44336;">Save Plan</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if meal_plans['Seafood Mix'].foods %}
+    <div class="card meal-plan-card seafood">
+        <div class="card-header" style="background-color: #2196F3;">
+            Seafood Mix Plan
+        </div>
+        <div class="card-body">
+            <div class="calorie-display" style="background-color: rgba(33, 150, 243, 0.1); color: #2196F3;">
+                <span style="font-weight: 600;">{{ meal_plans['Seafood Mix'].total_calories }}</span> calories
+            </div>
+            
+            <div>
+                {% for food in meal_plans['Seafood Mix'].foods %}
+                <div class="food-item">
+                    <span style="font-weight: 500; color: #2196F3;">#{{ loop.index }}</span> {{ food.food }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <form method="POST" action="{{ url_for('save_meal_plan') }}" style="margin-top: 20px;">
+                <input type="hidden" name="diet_type" value="Seafood Mix">
+                <input type="hidden" name="target_calories" value="{{ target_calories }}">
+                <input type="hidden" name="actual_calories" value="{{ meal_plans['Seafood Mix'].total_calories }}">
+                <input type="hidden" name="foods" value="{{ meal_plans['Seafood Mix'].foods|map(attribute='food')|list|tojson }}">
+                <button type="submit" class="btn btn-outline" style="border-color: #2196F3; color: #2196F3;">Save Plan</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if meal_plans.Vegan.foods %}
+    <div class="card meal-plan-card vegan">
+        <div class="card-header" style="background-color: #9C27B0;">
+            Vegan Plan
+        </div>
+        <div class="card-body">
+            <div class="calorie-display" style="background-color: rgba(156, 39, 176, 0.1); color: #9C27B0;">
+                <span style="font-weight: 600;">{{ meal_plans.Vegan.total_calories }}</span> calories
+            </div>
+            
+            <div>
+                {% for food in meal_plans.Vegan.foods %}
+                <div class="food-item">
+                    <span style="font-weight: 500; color: #9C27B0;">#{{ loop.index }}</span> {{ food.food }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <form method="POST" action="{{ url_for('save_meal_plan') }}" style="margin-top: 20px;">
+                <input type="hidden" name="diet_type" value="Vegan">
+                <input type="hidden" name="target_calories" value="{{ target_calories }}">
+                <input type="hidden" name="actual_calories" value="{{ meal_plans.Vegan.total_calories }}">
+                <input type="hidden" name="foods" value="{{ meal_plans.Vegan.foods|map(attribute='food')|list|tojson }}">
+                <button type="submit" class="btn btn-outline" style="border-color: #9C27B0; color: #9C27B0;">Save Plan</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

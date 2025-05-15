@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Calorie Buddy{% endblock %}
+
+{% block content %}
+<h1 class="page-header">Your Profile</h1>
+
+<div class="card">
+    <div class="card-header">
+        Account Information
+    </div>
+    <div class="card-body">
+        <div style="display: flex; gap: 20px;">
+            <div style="background-color: var(--primary-color); color: white; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600;">
+                {{ current_user.username[0]|upper }}
+            </div>
+            <div>
+                <h3 style="margin: 0 0 10px 0; color: var(--primary-dark);">{{ current_user.username }}</h3>
+                <p style="margin: 0; color: #666;">Email: {{ current_user.email }}</p>
+                <p style="margin: 0; color: #666;">Joined: {{ current_user.created_at }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="section-header">Saved Meal Plans</h2>
+
+{% if saved_plans %}
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+    {% for plan in saved_plans %}
+    <div class="card meal-plan-card {{ plan.diet_type|lower|replace('-', '') }}">
+        <div class="card-header" style="{% if plan.diet_type == 'Vegetarian' %}background-color: #4CAF50;{% elif plan.diet_type == 'Non-Vegetarian' %}background-color: #F44336;{% elif plan.diet_type == 'Seafood Mix' %}background-color: #2196F3;{% else %}background-color: #9C27B0;{% endif %}">
+            {{ plan.diet_type }} Plan - {{ plan.date }}
+        </div>
+        <div class="card-body">
+            <div class="calorie-display" style="{% if plan.diet_type == 'Vegetarian' %}background-color: rgba(76, 175, 80, 0.1); color: #4CAF50;{% elif plan.diet_type == 'Non-Vegetarian' %}background-color: rgba(244, 67, 54, 0.1); color: #F44336;{% elif plan.diet_type == 'Seafood Mix' %}background-color: rgba(33, 150, 243, 0.1); color: #2196F3;{% else %}background-color: rgba(156, 39, 176, 0.1); color: #9C27B0;{% endif %}">
+                <span style="font-weight: 600;">{{ plan.actual_calories }}</span> calories
+            </div>
+            
+            <div>
+                {% for food in plan.foods %}
+                <div class="food-item">
+                    <span style="font-weight: 500; {% if plan.diet_type == 'Vegetarian' %}color: #4CAF50;{% elif plan.diet_type == 'Non-Vegetarian' %}color: #F44336;{% elif plan.diet_type == 'Seafood Mix' %}color: #2196F3;{% else %}color: #9C27B0;{% endif %}">#{{ loop.index }}</span> {{ food }}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <form method="POST" action="{{ url_for('delete_meal_plan', plan_id=plan.id) }}" style="margin-top: 20px; display: flex; justify-content: space-between;">
+                <a href="{{ url_for('meal_planner') }}" class="btn btn-outline" style="{% if plan.diet_type == 'Vegetarian' %}border-color: #4CAF50; color: #4CAF50;{% elif plan.diet_type == 'Non-Vegetarian' %}border-color: #F44336; color: #F44336;{% elif plan.diet_type == 'Seafood Mix' %}border-color: #2196F3; color: #2196F3;{% else %}border-color: #9C27B0; color: #9C27B0;{% endif %}">Generate Similar</a>
+                <button type="submit" class="btn btn-outline" style="border-color: #F44336; color: #F44336;">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body" style="text-align: center; padding: 40px;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">📋</div>
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">No Saved Meal Plans</h3>
+        <p style="color: #666; max-width: 500px; margin: 0 auto 20px auto;">You haven't saved any meal plans yet. Generate meal plans and save your favorites to access them quickly.</p>
+        <a href="{{ url_for('meal_planner') }}" class="btn btn-primary">Generate Meal Plans</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

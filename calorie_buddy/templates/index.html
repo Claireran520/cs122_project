@@ -1,65 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Calorie Buddy</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        h1 { color: #333; }
-        .tab-container { margin-top: 20px; }
-        .plan { margin-bottom: 40px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f2f2f2; }
-        .error { color: red; }
-    </style>
-</head>
-<body>
-    <h1>🍽️ Calorie Buddy</h1>
-    <p>
-        Enter your desired daily calorie intake and generate balanced meal plans.
-    </p>
+{% extends "base.html" %}
 
-    {% if error %}
-        <p class="error">{{ error }}</p>
+{% block title %}Calorie Buddy - Your Smart Meal Planner{% endblock %}
+
+{% block content %}
+<div class="animate-fadeIn" style="margin-top: 40px; text-align: center;">
+    <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--primary-dark);">Welcome to <span style="color: var(--primary-color);">Calorie</span> <span style="color: var(--secondary-color);">Buddy</span></h1>
+    <p style="font-size: 1.2rem; max-width: 700px; margin: 20px auto; color: #666;">Generate optimized meal plans that perfectly match your calorie goals with our smart AI-powered meal planning system.</p>
+    
+    {% if current_user.is_authenticated %}
+    <div style="margin-top: 30px;">
+        <a href="{{ url_for('meal_planner') }}" class="btn btn-primary" style="margin-right: 10px;">Create Meal Plan</a>
+        <a href="{{ url_for('analytics') }}" class="btn btn-outline">View Analytics</a>
+    </div>
+    {% else %}
+    <div style="margin-top: 30px;">
+        <a href="{{ url_for('login') }}" class="btn btn-primary" style="margin-right: 10px;">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline">Register Now</a>
+    </div>
     {% endif %}
+</div>
 
-    <form method="POST">
-        <label for="calories">Target Calories:</label>
-        <input type="number" id="calories" name="calories" value="{{ target_calories }}" min="100" max="5000" step="100">
-        <button type="submit">Generate Meal Plans</button>
-    </form>
-
-    {% if meal_plans %}
-        <div class="tab-container">
-            {% for category, items in meal_plans.items() %}
-                <div class="plan">
-                    <h2>{{ category }} Meal Plan</h2>
-                    {% if items %}
-                        <p><strong>Total Calories:</strong> {{ items | sum(attribute='calories') }}</p>
-                        <table>
-                            <tr>
-                                <th>Food Category</th>
-                                <th>Food Item</th>
-                                <th>Serving Size</th>
-                                <th>Calories</th>
-                            </tr>
-                            {% for item in items %}
-                            <tr>
-                                <td>{{ item.subcategory }}</td>
-                                <td>{{ item.food }}</td>
-                                <td>{{ item.serving }}</td>
-                                <td>{{ item.calories }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    {% else %}
-                        <p style="color: red;">Could not generate a balanced {{ category }} meal plan.</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
+<div class="features-grid animate-fadeIn" style="animation-delay: 0.2s;">
+    <div class="card">
+        <div class="card-body">
+            <div class="feature-icon">
+                <span style="font-size: 1.5rem;">🍽️</span>
+            </div>
+            <h3 style="color: var(--primary-dark); font-weight: 600;">Smart Meal Planning</h3>
+            <p>Our intelligent algorithm creates perfectly balanced meal plans that match your exact calorie requirements.</p>
         </div>
-    {% endif %}
-</body>
-</html>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="feature-icon">
+                <span style="font-size: 1.5rem;">🌱</span>
+            </div>
+            <h3 style="color: var(--primary-dark); font-weight: 600;">Dietary Preferences</h3>
+            <p>Choose from Vegetarian, Non-Vegetarian, Seafood Mix, and Vegan options for personalized nutrition.</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="feature-icon">
+                <span style="font-size: 1.5rem;">📊</span>
+            </div>
+            <h3 style="color: var(--primary-dark); font-weight: 600;">Progress Tracking</h3>
+            <p>Visualize your nutrition journey with interactive charts and comprehensive analytics.</p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 60px; animation-delay: 0.3s;" class="animate-fadeIn">
+    <h2 class="section-header">How to Get Started</h2>
+    
+    <div style="margin-top: 30px;">
+        <div class="step-indicator">
+            <div class="step-number">1</div>
+            <div>
+                <h4 style="margin: 0 0 5px 0; color: var(--primary-dark);">Generate Meal Plans</h4>
+                <p style="margin: 0; color: #666;">Navigate to the 'Meal Planner' page to create personalized meal plans that match your specific calorie goals.</p>
+            </div>
+        </div>
+        
+        <div class="step-indicator">
+            <div class="step-number">2</div>
+            <div>
+                <h4 style="margin: 0 0 5px 0; color: var(--primary-dark);">Save Your Favorite Meals</h4>
+                <p style="margin: 0; color: #666;">Find meal combinations you love? Save them to your profile for quick access in the future.</p>
+            </div>
+        </div>
+        
+        <div class="step-indicator">
+            <div class="step-number">3</div>
+            <div>
+                <h4 style="margin: 0 0 5px 0; color: var(--primary-dark);">Track Your Nutritional Journey</h4>
+                <p style="margin: 0; color: #666;">Visit the 'Analytics' page to visualize your calorie intake patterns and track your progress over time.</p>
+            </div>
+        </div>
+        
+        <div class="step-indicator">
+            <div class="step-number">4</div>
+            <div>
+                <h4 style="margin: 0 0 5px 0; color: var(--primary-dark);">Manage Your Profile</h4>
+                <p style="margin: 0; color: #666;">Check your account information and access all your saved meal plans in the 'Profile' page.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

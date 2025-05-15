@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Calorie Buddy{% endblock %}
+
+{% block content %}
+<h1 class="page-header">Calorie Analytics</h1>
+
+{% if has_data %}
+<div class="card">
+    <div class="card-header">
+        Calories by Diet Type
+    </div>
+    <div class="card-body">
+        <div id="chart1"></div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <div class="card-header">
+        Target vs Actual Comparison
+    </div>
+    <div class="card-body">
+        <div id="chart2"></div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <div class="card-header">
+        Diet Type Distribution
+    </div>
+    <div class="card-body">
+        <div id="chart3"></div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <div class="card-header">
+        Summary Statistics
+    </div>
+    <div class="card-body">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <div style="text-align: center; padding: 20px; background-color: #f9f9f9; border-radius: 8px; flex: 1; margin-right: 10px;">
+                <div style="font-size: 1.5rem; font-weight: 600; color: var(--primary-color);">{{ most_popular['Diet Type'] }}</div>
+                <div style="color: #666;">Most Popular Diet Type</div>
+            </div>
+            <div style="text-align: center; padding: 20px; background-color: #f9f9f9; border-radius: 8px; flex: 1; margin-left: 10px;">
+                <div style="font-size: 1.5rem; font-weight: 600; color: var(--primary-color);">{{ most_popular['Percentage'] }}%</div>
+                <div style="color: #666;">Percentage of Total</div>
+            </div>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Diet Type</th>
+                    <th>Average Calories</th>
+                    <th>Minimum Calories</th>
+                    <th>Maximum Calories</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in stats %}
+                <tr>
+                    <td>{{ stat['Diet Type'] }}</td>
+                    <td>{{ stat['Average'] }}</td>
+                    <td>{{ stat['Minimum'] }}</td>
+                    <td>{{ stat['Maximum'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body" style="text-align: center; padding: 40px;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">📊</div>
+        <h3 style="color: var(--primary-dark); margin-bottom: 10px;">No Analytics Data Available</h3>
+        <p style="color: #666; max-width: 500px; margin: 0 auto 20px auto;">Generate some meal plans to see your nutrition analytics and track your progress over time.</p>
+        <a href="{{ url_for('meal_planner') }}" class="btn btn-primary">Generate Meal Plans</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if has_data %}
+<script>
+    var chart1Data = {{ chart1_json|safe }};
+    var chart2Data = {{ chart2_json|safe }};
+    var chart3Data = {{ chart3_json|safe }};
+    
+    Plotly.newPlot('chart1', chart1Data.data, chart1Data.layout);
+    Plotly.newPlot('chart2', chart2Data.data, chart2Data.layout);
+    Plotly.newPlot('chart3', chart3Data.data, chart3Data.layout);
+</script>
+{% endif %}
+{% endblock %}

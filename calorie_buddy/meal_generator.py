@@ -439,4 +439,4 @@ def generate_balanced_meal_plan(foods_df, target_calories, min_calories, max_cal
     
     return meal_plan
 
-# We've replaced the old function with direct logic in generate_balanced_meal_plan
+
